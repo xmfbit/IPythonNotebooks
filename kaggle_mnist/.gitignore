@@ -1,0 +1,7 @@
+*.log
+*.caffemodel
+*.solverstate
+*.csv
+*.txt
+*.h5
+*.png
