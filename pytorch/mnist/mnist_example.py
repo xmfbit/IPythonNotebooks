@@ -27,6 +27,23 @@ print '==>>> total trainning batch number: {}'.format(len(train_loader))
 print '==>>> total testing batch number: {}'.format(len(test_loader))
 
 ## network
+class MLPNet(nn.Module):
+    def __init__(self):
+        super(MLPNet, self).__init__()
+        self.fc1 = nn.Linear(28*28, 500)
+        self.fc2 = nn.Linear(500, 256)
+        self.fc3 = nn.Linear(256, 10)
+        self.ceriation = nn.CrossEntropyLoss()
+    def forward(self, x, target):
+        x = x.view(-1, 28*28)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        loss = self.ceriation(x, target)
+        return x, loss
+    def name(self):
+        return 'mlpnet'
+
 class LeNet(nn.Module):
     def __init__(self):
         super(LeNet, self).__init__()
@@ -47,12 +64,13 @@ class LeNet(nn.Module):
         x = self.fc2(x)
         loss = self.ceriation(x, target)
         return x, loss
-
+    def name(self):
+        return 'lenet'
 ## training
-model = LeNet().cuda()
+model = MLPNet().cuda()
 
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
-for epoch in xrange(20):
+for epoch in xrange(10):
     # trainning
     for batch_idx, (x, target) in enumerate(train_loader):
         optimizer.zero_grad()
@@ -73,3 +91,5 @@ for epoch in xrange(20):
     accuracy = correct_cnt*1.0/len(test_loader)/batch_size
     ave_loss /= len(test_loader)
     print '==>>> epoch: {}, test loss: {:.6f}, accuracy: {:.4f}'.format(epoch, ave_loss, accuracy)
+
+torch.save(model.state_dict(), model.name())
